@@ -53,8 +53,6 @@ async def dashboard():
                     }
 
                     const currentClientNames = new Set(data.clients.map(c => c.name));
-                    
-                    // 클라이언트 목록 구성이 달라졌을 때만 전체 카드 구조를 다시 그림 (깜빡임 원인 차단)
                     let needFullRender = clientListChanged(knownClients, currentClientNames);
                     
                     if (needFullRender) {
@@ -79,7 +77,6 @@ async def dashboard():
                         container.innerHTML = html;
                     }
 
-                    // 목록이 같을 때는 이미지만 부드럽게 갱신하고 배지/테두리 상태만 실시간 동기화
                     for (let c of data.clients) {
                         const img = document.getElementById(`img-${c.name}`);
                         if (img) {
@@ -94,7 +91,6 @@ async def dashboard():
                             card.className = isLive ? 'card live' : 'card';
                             badge.className = isLive ? 'badge badge-live' : 'badge badge-normal';
                             badge.innerText = isLive ? '🔥 집중확인 모드 (0.5초)' : '일반 모드 (3초)';
-                            // onclick 핸들러의 최신 command 업데이트를 위해 속성 재지정
                             card.setAttribute("onclick", `toggleMode('${c.name}', '${c.command}')`);
                         }
                     }
@@ -122,7 +118,6 @@ async def dashboard():
                 updateDashboard();
             }
 
-            // 0.5초마다 깜빡임 없이 이미지와 상태만 부드럽게 갱신
             setInterval(updateDashboard, 500);
             updateDashboard();
         </script>
@@ -152,8 +147,6 @@ async def get_screen(client_name: str):
     if client_name in screenshots:
         return Response(content=screenshots[client_name], media_type="image/jpeg")
     return Response(status_code=404)
-
-@app.set_mode = None # type: ignore
 
 @app.post("/set_mode")
 async def set_mode(payload: dict = Body(...)):
